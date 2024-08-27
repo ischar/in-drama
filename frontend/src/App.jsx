@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./pages/Root";
 import Main from "./pages/Main";
 import SearchResult from "./pages/SearchResult";
-import Login from "./pages/Login";
 
 const router = createBrowserRouter([
   {
@@ -13,10 +12,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Main />,
-      },
-      {
-        path: "/login",
-        element: <Login />
       },
       {
         path: "/location/:dramaName",
