@@ -1,7 +1,9 @@
+/* eslint-disable */
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./pages/Root";
 import Main from "./pages/Main";
 import SearchResult from "./pages/SearchResult";
+import Login from "./pages/Login";
 
 const router = createBrowserRouter([
   {
@@ -13,6 +15,10 @@ const router = createBrowserRouter([
         element: <Main />,
       },
       {
+        path: "/login",
+        element: <Login />
+      },
+      {
         path: "/location/:dramaName",
         element: <SearchResult />,
       },
@@ -22,8 +28,8 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <div className="w-screen h-screen bg-white dark:bg-dark-black items-center justify-center flex">
-      <div className="w-[1280px] h-screen m-auto">
+    <div className="min-h-screen bg-white dark:bg-dark-black">
+      <div className="w-full h-full">
         <RouterProvider router={router} />
       </div>
     </div>
