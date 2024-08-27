@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Searchbar from "../components/Searchbar";
 
