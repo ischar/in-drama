@@ -1,0 +1,201 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+pipeline {
+    agent any
+
+    stages {
+        stage("Checkout") {
+            steps {
+                echo 'Checkout backend'
+                sh '''
+				        rm -r backend
+				'''
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/backend']],
+                    userRemoteConfigs: [[url: 'https://github.com/ischar/in-drama.git']]
+                ])
+            }
+            post {
+                success {
+                    echo 'Checkout stage succeeded!'
+                }
+                failure {
+                    echo 'Checkout stage failed!'
+                }
+            }
+        }
+
+        stage("Add Properties") {
+            steps {
+                dir('be-deploy/backend') {
+                    withCredentials([file(credentialsId: 'PROPERTIES', variable: 'PROPERTIES')]) {
+                        sh 'sudo cp ${PROPERTIES} application.properties'
+                    }
+                }
+            }
+            post {
+                success {
+                    echo 'Add PROPERTIES stage succeeded!'
+                }
+                failure {
+                    echo 'Add PROPERTIES stage failed!'
+                }
+            }
+        }
+        stage("Build") {
+            steps {
+                echo 'Build Backend'
+                sh '''
+                    cd backend
+                    sudo su
+                    sudo rm -r /var/jenkins_home/workspace/build
+                    mkdir /var/jenkins_home/workspace/build
+                    chmod +x gradlew
+                    ./gradlew clean build -x test 
+                '''
+            }
+            post {
+                success {
+                    echo 'Build stage succeeded!'
+                }
+                failure {
+                    echo 'Build stage failed!'
+                }
+            }
+        }
+
+        stage("Send Build") {
+            steps {
+			    sshPublisher(publishers: [sshPublisherDesc(configName: 'ubuntu', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/', remoteDirectorySDF: false, 
+                removePrefix: 'backend/build/libs', sourceFiles: 'backend/build/libs/indrama-0.0.1-SNAPSHOT.jar')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            }
+            post {
+                success {
+                    echo 'Send build stage succeeded!'
+                }
+                failure {
+                    echo 'Send build stage failed!'
+                }
+            }  
+        }
+
+        stage("Build Docker & Run") {
+            steps {
+                echo "Build Docker & Run"
+                script {
+                    sshPublisher(publishers: [sshPublisherDesc(
+                        configName: 'ubuntu', trnasfers: [sshTransfer(sourceFiles: 'remote_script.sh', remoteDirectory: '', removePrefix: '', execCommand: 'bash remote_script.sh')],
+                        usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: true
+                    )])
+                    withCredentials([
+                        string(credentialsId: 'BE_CONTAINER_NAME', variable: 'BE_CONTAINER_NAME'),
+                        string(credentialsId: 'BE_BUILD_IMAGE_NAME', variable: 'BE_BUILD_IMAGE_NAME'),
+                        string(credentialsId: 'PUBLIC_IP', variable: 'PUBLIC_IP'),
+                        string(credentialsId: 'USER_NAME', variable: 'USER_NAME'),
+                        string(credentialsId: 'BE_PORT', variable: 'BE_PORT')
+                    ]) {
+
+                        def containerName = BE_CONTAINER_NAME
+                        def buildImageName = BE_BUILD_IMAGE_NAME
+                        def publicIp = PUBLIC_IP
+                        def userName = USER_NAME
+                        def port = BE_PORT
+                        def remoteScriptContent = """
+                            if sudo docker ps -a --filter name=${containerName} | grep -q .; then
+                                sudo docker stop ${containerName} || true
+                                sudo docker rm ${containerName} || true
+                                sudo docker rmi ${buildImageName} || true
+                            fi
+                            sudo mv ~/indrama-0.0.1-SNAPSHOT.jar ~/remote/indrama-0.0.1-SNAPSHOT.jar
+                            cd remote
+                            sudo docker build -t ${buildImageName} .
+                            sudo docker run -d --name ${containerName} -p ${port}:${port} ${buildImageName}:latest
+                        """
+
+                        // 로컬에 스크립트 파일을 작성
+                        writeFile file: 'remote_script.sh', text: remoteScriptContent
+                        sh 'chmod +x remote_script.sh'
+                        
+                        // SCP와 SSH를 사용하여 원격 서버로 스크립트 전송 및 실행
+                        sh """
+                            scp -o StrictHostKeyChecking=no remote_script.sh ${userName}@${publicIp}:~/remote_script.sh
+                            ssh -o StrictHostKeyChecking=no ${userName}@${publicIp} "bash ~/remote_script.sh"
+                            rm remote_script.sh
+                        """
+                    }
+                }   
+            
+            }
+            post {
+                success {
+                    echo 'Build Docker & Run stage succeeded!'
+                }
+                failure {
+                    echo 'Build Docker & Run stage failed!'
+                }
+            }   
+        }    
+
+    }
+
+    post {
+        success {
+            script {
+                notifyDiscord(true)
+            }
+        }
+        failure {
+            script {
+                notifyDiscord(false)
+            }
+        }
+    }
+}
+
+def notifyDiscord(boolean isSuccess) {
+    def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
+    def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+    def buildTime = sh(script: "date -u --iso-8601=seconds", returnStdout: true).trim()
+
+    withCredentials([string(credentialsId: 'BE_DISCORD_WEBHOOK_URL', variable: 'DISCORD_WEBHOOK_URL'),
+                     string(credentialsId: 'DISCORD_USER_MAP', variable: 'DISCORD_USER_MAP'),
+                     string(credentialsId: 'DISCORD_THUMBNAIL_URL', variable: 'DISCORD_THUMBNAIL_URL')]) {
+        def discordWebhookUrl = DISCORD_WEBHOOK_URL
+        def discordUserMapJson = DISCORD_USER_MAP
+        def discordThumbnailUrl = DISCORD_THUMBNAIL_URL
+        def discordUserMap = readJSON text: discordUserMapJson
+
+        def authorDiscordId = discordUserMap.get(author, "defaultDiscordUserID")
+        def status = isSuccess ? "✅ **Build Succeeded**" : "❌ **Build Failed**"
+        def color = isSuccess ? 3066993 : 15158332
+
+        def payload = JsonOutput.toJson([
+            username: "Jenkins",
+            content: "${status} <@${authorDiscordId}>",
+            embeds: [[
+                title: "Build #${env.BUILD_NUMBER} ${isSuccess ? 'succeeded' : 'failed'}",
+                description: "Project: **${env.JOB_NAME}**",
+                fields: [
+                    [name: "Author", value: "<@${authorDiscordId}>", inline: true],
+                    [name: "Build Number", value: "${env.BUILD_NUMBER}", inline: true],
+                    [name: "Build URL", value: "${env.BUILD_URL}"],
+                    [name: "Commit Message", value: "${commitMessage}"],
+                    [name: "Build Time", value: "${buildTime}", inline: true],
+                    [name: "Result", value: "${isSuccess ? 'Success' : 'Failed'}", inline: true]
+                ],
+                color: color,
+                 stimestamp: buildTime,
+                thumbnail: [url: discordThumbnailUrl] 
+            ]]
+        ])
+
+        httpRequest(
+            url: discordWebhookUrl,
+            httpMode: 'POST',
+            contentType: 'APPLICATION_JSON',
+            requestBody: payload
+        )
+    }
+}
