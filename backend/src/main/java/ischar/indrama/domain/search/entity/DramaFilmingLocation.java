@@ -1,4 +1,4 @@
-package ischar.indrama.domain.entity;
+package ischar.indrama.domain.search.entity;
 
 import jakarta.persistence.*;
 

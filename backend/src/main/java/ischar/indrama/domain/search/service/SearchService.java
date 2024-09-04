@@ -1,10 +1,10 @@
-package ischar.indrama.domain.service;
+package ischar.indrama.domain.search.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ischar.indrama.domain.dto.SearchResultDto;
-import ischar.indrama.domain.entity.Location;
-import ischar.indrama.domain.exception.LocationNotFoundException;
-import ischar.indrama.domain.repository.LocationRepository;
+import ischar.indrama.domain.search.dto.SearchResultDto;
+import ischar.indrama.domain.search.entity.FilmingLocationInfo;
+import ischar.indrama.domain.search.exception.LocationNotFoundException;
+import ischar.indrama.domain.search.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,7 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public SearchResultDto getLocations(String dramaName) {
-        List<Location> locations = locationRepository.findLatitudeAndLongitudeByTitle(dramaName).orElseThrow(() -> new LocationNotFoundException("촬영지를 찾을 수 없습니다."));
-        return new SearchResultDto(locations);
+        List<FilmingLocationInfo> locationInfos = locationRepository.findLatitudeAndLongitudeByTitle(dramaName).orElseThrow(() -> new LocationNotFoundException("촬영지를 찾을 수 없습니다."));
+        return new SearchResultDto(locationInfos);
     }
 }

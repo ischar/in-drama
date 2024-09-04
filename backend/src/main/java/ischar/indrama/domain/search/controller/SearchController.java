@@ -1,7 +1,7 @@
-package ischar.indrama.domain.controller;
+package ischar.indrama.domain.search.controller;
 
-import ischar.indrama.domain.dto.SearchResultDto;
-import ischar.indrama.domain.service.SearchService;
+import ischar.indrama.domain.search.dto.SearchResultDto;
+import ischar.indrama.domain.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

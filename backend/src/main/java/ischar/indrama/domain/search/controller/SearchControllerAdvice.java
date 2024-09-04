@@ -1,6 +1,6 @@
-package ischar.indrama.domain.controller;
+package ischar.indrama.domain.search.controller;
 
-import ischar.indrama.domain.exception.LocationNotFoundException;
+import ischar.indrama.domain.search.exception.LocationNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
