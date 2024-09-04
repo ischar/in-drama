@@ -8,7 +8,7 @@ export default function RootLayout() {
       <header className="h-20 w-full">
         <Header />
       </header>
-      <main>
+      <main className="h-[calc(100%-20px)]">
         <Outlet />
       </main>
       <footer></footer>

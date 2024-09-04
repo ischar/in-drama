@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      borderWidth: {
+        '0.5': '0.5px',
+      },
       colors: {
         'light-element-gray1': '#737373',
         'light-fg-black': '#0C0C0C',

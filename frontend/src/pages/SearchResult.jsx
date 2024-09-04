@@ -5,16 +5,17 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Searchbar from "../components/Searchbar";
 import Map from "../components/Map";
+import Infowindow from "../components/InfoWindow";
 
 export default function SearchResult() {
-  const [locations, setLocations] = useState();
+  const [locationInfos, setLocationInfos] = useState();
 
   const { dramaName } = useParams();
   useEffect(() => {
     axios
       .get(`${API.SEARCH}/${dramaName}`)
       .then((res) => {
-        setLocations(res.data);
+        setLocationInfos(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -22,9 +23,20 @@ export default function SearchResult() {
   }, []);
 
   return (
-    <div className="w-full">
-      <Searchbar />
-      <Map locations={locations} />
+    <div className="w-full h-full">
+      <div className="flex flex-row w-full h-full">
+        {locationInfos ? (
+          <>
+            <div className="absolute z-50 right-32 top-32 w-96 h-10">
+              <Searchbar />
+            </div>
+            <Infowindow locationInfos={locationInfos} />
+            <Map locationInfos={locationInfos} />
+          </>
+        ) : (
+          <p>로딩중입니다...</p>
+        )}
+      </div>
     </div>
   );
 }
