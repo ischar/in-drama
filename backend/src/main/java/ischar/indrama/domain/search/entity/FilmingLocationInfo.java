@@ -28,4 +28,6 @@ public class FilmingLocationInfo {
     @Column(name = "closed_days")
     private String closedDays;
 
+    private String location;
+
 }

@@ -49,6 +49,8 @@ public class DramaFilmingLocation {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
+    private String location;
+
     @Column(name = "last_updated", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime lastUpdated;
 
