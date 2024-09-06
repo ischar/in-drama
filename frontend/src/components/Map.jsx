@@ -46,5 +46,5 @@ export default function Map({ locationInfos }) {
     }
   }, []);
 
-  return <div id="map" className="w-full h-[1024px] grayscale" />;
+  return <div id="map" className="w-full h-full grayscale" />;
 }

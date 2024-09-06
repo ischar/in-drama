@@ -1,8 +1,8 @@
 import LocationCard from "./LocationCard";
 
-export default function Infowindow({ locationInfos = "" }) {
+export default function Infowindow({ locationInfos = "",  onLocationClick }) {
   return (
-    <div className="absolute z-50 left-0 bg-white w-96  h-full">
+    <div className="absolute z-50 left-0 bg-white w-96 h-calc-100-minus-20">
       <div className="mt-4 mx-4">
         {locationInfos ? (
           <>

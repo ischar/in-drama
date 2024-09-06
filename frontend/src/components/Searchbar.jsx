@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Searchbar({dramaName = "", radius="0"}) {
+export default function Searchbar({dramaName = ""}) {
   const [searchValue, setSearchValue] = useState(dramaName);
   const navigate = useNavigate();
 
