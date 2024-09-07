@@ -11,16 +11,14 @@ import Modal from "../components/Modal";
 export default function SearchResult() {
   const [locationInfos, setLocationInfos] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [location, setLocation] = useState('');
-
+  const [location, setLocation] = useState("");
+  const { dramaName } = useParams();
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const { dramaName } = useParams();
-
   const handleLocationClick = (data) => {
     openModal();
-  }
+  };
 
   useEffect(() => {
     axios
@@ -31,7 +29,7 @@ export default function SearchResult() {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [dramaName]);
 
   return (
     <div className="w-full h-full">
@@ -45,10 +43,12 @@ export default function SearchResult() {
               <Searchbar />
             </div>
             <div className="h-full w-full dark:bg-dark dark:opacity-85">
-            <Map locationInfos={locationInfos} />
-
+              <Map locationInfos={locationInfos} />
             </div>
-            <Infowindow locationInfos={locationInfos} onLocationClick={handleLocationClick} />
+            <Infowindow
+              locationInfos={locationInfos}
+              onLocationClick={handleLocationClick}
+            />
           </>
         ) : (
           <p>로딩중입니다...</p>

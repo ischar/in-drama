@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      width: {
+        '24/25': '96%'
+      },
       height: {
         'calc-100-minus-20': 'calc(100vh - 80px)'
       },
