@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { API } from "../utils/config";
+import { API } from "../../utils/config";
 import axios from "axios";
-import Trie from "../utils/trie";
+import Trie from "../../utils/trie";
 
 export default function Searchbar({ dramaName = "" }) {
   const [searchValue, setSearchValue] = useState(dramaName);
@@ -116,13 +116,13 @@ export default function Searchbar({ dramaName = "" }) {
         </div>
         <div className="w-full relative">
           {suggestions.length > 0 && (
-            <ul className="absolute w-full z-50 bg-white mx-0 text-sm text-black font-medium rounded-b-lg">
+            <ul className="absolute w-full z-49 bg-white mx-0 text-sm text-black font-medium rounded-b-lg">
               {suggestions.map((suggestion, index) => (
-                <div className="hover:bg-dark-element-yellow active:bg-dark-element-yellow active:opacity-85">
+                <div className="hover:bg-gray-100 active:bg-gray-200">
                   <li
                     s
                     onClick={() => handleDramaClick(suggestion)}
-                    className="flex flex-row  my-4 text-left items-center"
+                    className="flex flex-row  py-3 text-left items-center"
                   >
                     <div className="items-center mr-4 ps-3 pointer-events-none">
                       {searchSvg}

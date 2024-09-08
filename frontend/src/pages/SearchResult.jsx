@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { API } from "../utils/config";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Searchbar from "../components/Searchbar";
-import Map from "../components/Map";
-import Infowindow from "../components/InfoWindow";
+import Searchbar from "../components/search/Searchbar";
+import Map from "../components/map/Map";
+import Infowindow from "../components/map/InfoWindow";
 import Modal from "../components/Modal";
 
 export default function SearchResult() {
@@ -33,10 +33,8 @@ export default function SearchResult() {
 
   return (
     <div className="w-full h-full">
+      <Modal isOpen={isModalOpen} />
       <div className="flex flex-row w-full h-full">
-        <Modal isOpen={isModalOpen} onClose={closeModal}>
-          {location}
-        </Modal>
         {locationInfos ? (
           <>
             <div className="absolute z-50 right-12 top-32 w-96 h-10">

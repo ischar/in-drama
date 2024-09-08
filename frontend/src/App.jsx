@@ -1,8 +1,12 @@
 /* eslint-disable */
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { KEY } from "./utils/config";
+import { Provider } from 'react-redux';
 import RootLayout from "./pages/Root";
 import Main from "./pages/Main";
 import SearchResult from "./pages/SearchResult";
+import store from "./store/index";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +29,11 @@ function App() {
   return (
     <div className="h-full bg-white dark:bg-dark-black">
       <div className="w-full h-full">
-        <RouterProvider router={router} />
+        <Provider store={store}>
+          <GoogleOAuthProvider clientId={KEY.GOOGLE}>
+            <RouterProvider router={router} />
+          </GoogleOAuthProvider>
+        </Provider>
       </div>
     </div>
   );
