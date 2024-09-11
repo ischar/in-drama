@@ -81,7 +81,7 @@ export default function Searchbar({ dramaName = "" }) {
   return (
     { dramaNames } && (
       <form className="max-w-full mx-auto">
-        <label className="mb-2 text-sm font-medium bg- text-gray-900 sr-only dark:text-white">
+        <label className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
           Search
         </label>
         <div className="relative">
@@ -116,7 +116,7 @@ export default function Searchbar({ dramaName = "" }) {
         </div>
         <div className="w-full relative">
           {suggestions.length > 0 && (
-            <ul className="absolute w-full z-49 bg-white mx-0 text-sm text-black font-medium rounded-b-lg">
+            <ul className="absolute w-full bg-white mx-0 text-sm text-black font-medium rounded-b-lg">
               {suggestions.map((suggestion, index) => (
                 <div className="hover:bg-gray-100 active:bg-gray-200">
                   <li

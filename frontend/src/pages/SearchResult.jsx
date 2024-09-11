@@ -1,20 +1,18 @@
 /* eslint-disable */
 import { useParams } from "react-router-dom";
 import { API } from "../utils/config";
+import { useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Searchbar from "../components/search/Searchbar";
 import Map from "../components/map/Map";
 import Infowindow from "../components/map/InfoWindow";
-import Modal from "../components/Modal";
+import Modal from "../components/common/Modal";
 
 export default function SearchResult() {
   const [locationInfos, setLocationInfos] = useState();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [location, setLocation] = useState("");
+  const { isModalOpen, location } = useSelector((state) => state.location);
   const { dramaName } = useParams();
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   const handleLocationClick = (data) => {
     openModal();
@@ -31,13 +29,14 @@ export default function SearchResult() {
       });
   }, [dramaName]);
 
+
   return (
     <div className="w-full h-full">
-      <Modal isOpen={isModalOpen} />
+      <Modal isOpen={isModalOpen}>{location}</Modal>
       <div className="flex flex-row w-full h-full">
         {locationInfos ? (
           <>
-            <div className="absolute z-50 right-12 top-32 w-96 h-10">
+            <div className="absolute z-40 right-12 top-32 w-96 h-10">
               <Searchbar />
             </div>
             <div className="h-full w-full dark:bg-dark dark:opacity-85">
@@ -45,7 +44,6 @@ export default function SearchResult() {
             </div>
             <Infowindow
               locationInfos={locationInfos}
-              onLocationClick={handleLocationClick}
             />
           </>
         ) : (

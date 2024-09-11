@@ -2,9 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Login from "../auth/Login";
 import logo from "../../assets/logo.png";
+import Profile from "../auth/Profile";
 
 export default function Header({ isProfileOpen, setIsProfileOpen }) {
-  const { user, isLoggedIn } = useSelector((state) => state);
+  const { user, isLoggedIn } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   function onClickLogo() {
@@ -12,16 +13,15 @@ export default function Header({ isProfileOpen, setIsProfileOpen }) {
   }
 
   function handleProfileToggle() {
-    setIsProfileOpen(prev => !prev);
+    setIsProfileOpen((prev) => !prev);
   }
 
   function handleClickProfile(event) {
     if (event) {
-    event.stopPropagation(); // Prevents click from bubbling up to document
+      event.stopPropagation(); // Prevents click from bubbling up to document
     }
     handleProfileToggle((prev) => !prev);
-  };
-
+  }
 
   return (
     <div className="flex flex-row w-full h-full items-center justify-between text-light-fg-black dark:text-white">
@@ -47,20 +47,7 @@ export default function Header({ isProfileOpen, setIsProfileOpen }) {
             alt="profile"
           />
           {isProfileOpen && (
-            <div className="absolute top-10 right-10 w-64 h-56 rounded-lg bg-dark-element-gray1 ">
-              <div className="flex flex-col items-center justify-center">
-                <img src={user.picture} className="w-16 h-16 mt-6 rounded-lg" alt="profile" />
-                <p className="my-3">안녕하세요, {user.name}님.</p>
-                <ul className="flex flex-row mt-3 text-center items-center justify-center">
-                  <li className="bg-zinc-800 px-6 py-3 rounded-lg text-sm mx-0.5">
-                    마이페이지
-                  </li>
-                  <li className="bg-zinc-800 px-6 py-3 rounded-lg text-sm mx-0.5">
-                    로그아웃
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <Profile user={user} onClick={handleClickProfile} />
           )}
         </div>
       ) : (
