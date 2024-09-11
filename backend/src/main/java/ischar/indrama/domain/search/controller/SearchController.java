@@ -24,7 +24,6 @@ public class SearchController {
         return ResponseEntity.ok(responseData);
     }
 
-
     @GetMapping("/{dramaName}")
     public ResponseEntity<SearchResultDto> search(@PathVariable String dramaName) {
 
