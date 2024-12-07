@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { API } from "../../utils/config";
+import { API, GENRE_MAP } from "../../utils/config";
 import axios from "axios";
 import HorizontalScroll from "../common/HorizontalScroll";
 import Drama from "./Drama";
@@ -12,11 +12,13 @@ export default function DramaSection({ genre = "recent" }) {
   const isLoading = useSelector((state) => state.loading.isLoading);
 
   useEffect(() => {
+    const genreKey = genre !== "recent" ? GENRE_MAP.get(genre) : genre;
     dispatch(setLoading(true)); // 로딩 시작
     axios
-      .get(`${API.DRAMA}/${genre}`)
+      .get(`${API.DRAMA}/${genreKey}`)
       .then((res) => {
         setThumbnails(res.data.dramaThumbnailList);
+        console.log(res.data.dramaThumbnailList);
       })
       .catch((error) => {
         console.log(error);
@@ -24,7 +26,7 @@ export default function DramaSection({ genre = "recent" }) {
       .finally(() => {
         dispatch(setLoading(false));
       });
-  }, []);
+  }, [genre]);
 
   return (
     <div className="w-full">
